@@ -25,7 +25,8 @@ router.post("/create", (req, res) => {
     const user = new User({
         username: req.body.username,
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        password2: req.body.password2
     });
     user.save()
         .then(() => {
@@ -43,7 +44,8 @@ router.post("/hashcreate", (req, res) => {
     const user = new User({
         username: req.body.username,
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        password2: req.body.password2
     });
     bcrypt.genSalt(10, (err, salt) => {
         bcrypt.hash(user.password, salt, (err, hash) => {
@@ -53,6 +55,15 @@ router.post("/hashcreate", (req, res) => {
                 .catch(err => console.log(err));
         });
     });
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(user.password2, salt, (err, hash) => {
+            if (err) throw err;
+            user.password2 = hash;
+            user.save().then(user => res.json(user))
+                .catch(err => console.log(err));
+        });
+    });
+
 });
 
 
@@ -68,24 +79,24 @@ router.put("/update", (req, res) => {
 })
 
 router.delete("/delete", (req, res) => {
- errors = {};
-  const password = req.body.password;
-  const hashedValue = req.body.hashedValue;
+    errors = {};
+    const password = req.body.password;
+    const hashedValue = req.body.hashedValue;
 
-  //User.find() using _id
-  //get the password from the found user
-// use this password as hashedvalue
+    //User.find() using _id
+    //get the password from the found user
+    // use this password as hashedvalue
 
-  bcrypt.compare(password, hashedValue).then(isMatch => {
-    if (isMatch) {
-    User.deleteOne({'username': req.body.username })
-        .then(({ ok, n }) => {
-            res.json(n)
-        })
-        .catch(err => res.status(404).json(err))
- } else {
-    errors.value = "Incorrect";
-    return res.status(400).json(errors);
-    }
-})
+    bcrypt.compare(password, hashedValue).then(isMatch => {
+        if (isMatch) {
+            User.deleteOne({ 'username': req.body.username })
+                .then(({ ok, n }) => {
+                    res.json(n)
+                })
+                .catch(err => res.status(404).json(err))
+        } else {
+            errors.value = "Incorrect";
+            return res.status(400).json(errors);
+        }
+    })
 })

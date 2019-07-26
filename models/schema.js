@@ -19,6 +19,12 @@ var userSchema = new Schema({
         required: true,
         minlength: 4
     },
+    password2: {
+        type: String,
+        required: true,
+        minlength: 4
+    }
+
 });
 
 let User = mongoose.model('User', userSchema);

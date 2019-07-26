@@ -2,7 +2,7 @@ const Validator = require("validator");
 const isEmpty = require("./isEmpty");
 
 module.exports = function validateUserInput(data) {
-console.log(data);
+    console.log(data);
 
     let errors = {};
 
@@ -10,6 +10,7 @@ console.log(data);
     data.username = !isEmpty(data.username) ? data.username : "";
     data.email = !isEmpty(data.email) ? data.email : "";
     data.password = !isEmpty(data.password) ? data.password : "";
+    data.password2 = !isEmpty(data.password2) ? data.password2 : "";
     //User validation rules
     if (Validator.isEmpty(data.username)) {
         errors.username = "username field is required";
@@ -31,6 +32,12 @@ console.log(data);
     if (!Validator.isLength(data.email, { min: 3, max: 320 })) {
         errors.email = "email in invalid";
     }
+
+    if (!Validator.equals(data.password, data.password2)) {
+        errors.password2 = "Passwords must match";
+    }
+
+
 
 
     return {
