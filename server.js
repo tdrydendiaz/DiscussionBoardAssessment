@@ -19,6 +19,7 @@ mongoose.connect(
 
 //username
 const user = require("./routes/user");
+const name = require("./routes/name");
 
 
 
@@ -26,6 +27,7 @@ app.use(bodyParser.urlencoded({extended:false}));
 app.use(bodyParser.json());
 
 app.use("/user", user);
+app.use("/name", name);
 
 
 const port = process.env.PORT || 5001;
