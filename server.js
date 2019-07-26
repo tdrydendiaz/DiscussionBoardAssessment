@@ -30,6 +30,7 @@ app.use("/user", user);
 app.use("/name", name);
 
 
-const port = process.env.PORT || 5001;
+const port = process.env.PORT || 5000;
 
 app.listen(port, () => console.log(`server running on port ${port}`));
+
