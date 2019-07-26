@@ -78,6 +78,8 @@ router.put("/update", (req, res) => {
         .catch(err => res.status(404).json(err));
 })
 
+
+
 router.delete("/delete", (req, res) => {
     errors = {};
     const password = req.body.password;
@@ -100,3 +102,46 @@ router.delete("/delete", (req, res) => {
         }
     })
 })
+
+
+router.post("/hashcreate2", (req, res) => {
+    const { errors, isValid } = validate(req.body);
+    if (!isValid) {
+        return res.status(400).json(errors);
+    };
+    const user = new User({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+        password2: req.body.password2
+    });
+  
+User.findOne(email).then(user => {
+
+    bcrypt.compare(email, user.email).then(isMatch => {
+      if (isMatch) { errors.email = "Email Already in Use";
+        return res.status(400).json(errors);
+
+      } else {
+         bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(user.password, salt, (err, hash) => {
+            if (err) throw err;
+            user.password = hash;
+            user.save().then(user => res.json(user))
+                .catch(err => console.log(err));
+        });
+    });
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(user.password2, salt, (err, hash) => {
+            if (err) throw err;
+            user.password2 = hash;
+            user.save().then(user => res.json(user))
+                .catch(err => console.log(err));
+        });
+    });
+      }
+    });
+
+  }).catch(err => res.status(404).json({ noItem: "Account cannot be made" }));
+
+});
