@@ -58,12 +58,6 @@ router.post("/hashcreate", (req, res) => {
 
 
 
-
-
-
-
-
-
 router.put("/update", (req, res) => {
     User.replaceOne({ 'username': req.body.username },
         { 'username': req.body.username, "email": req.body.email })
@@ -73,25 +67,25 @@ router.put("/update", (req, res) => {
         .catch(err => res.status(404).json(err));
 })
 
-// router.delete("/delete", (req, res) => {
-//  errors = {};
-//   const email = req.body.email;
-//   const hashedValue = req.body.hashedValue;
+router.delete("/delete", (req, res) => {
+ errors = {};
+  const password = req.body.password;
+  const hashedValue = req.body.hashedValue;
 
-//   //User.find() using _id
-//   //get the email from the found user
-// // use this email as hashedvalue
+  //User.find() using _id
+  //get the password from the found user
+// use this password as hashedvalue
 
-//   bcrypt.compare(email, hashedValue).then(isMatch => {
-//     if (isMatch) {
-//     User.deleteOne({'username': req.body.username })
-//         .then(({ ok, n }) => {
-//             res.json(n)
-//         })
-//         .catch(err => res.status(404).json(err))
-//  } else {
-//     errors.value = "Incorrect";
-//     return res.status(400).json(errors);
-//     }
-// })
-// })
+  bcrypt.compare(password, hashedValue).then(isMatch => {
+    if (isMatch) {
+    User.deleteOne({'username': req.body.username })
+        .then(({ ok, n }) => {
+            res.json(n)
+        })
+        .catch(err => res.status(404).json(err))
+ } else {
+    errors.value = "Incorrect";
+    return res.status(400).json(errors);
+    }
+})
+})
