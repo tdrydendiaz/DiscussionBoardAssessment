@@ -51,26 +51,26 @@ router.post("/createItem", (req, res) => {
     if (!isValid) {
         return res.status(400).json(errors);
     };
+    const user = new User({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password
+            });
     const item = new Item({
         name: req.body.username,
         context: req.body.context,
-        email: req.body.email
     });
-    User.find({ $or: [{ email: req.body.email }, { username: req.body.username }] }).then(currentUser => {
-        if (currentUser.length != 0) {
-            bcrypt.genSalt(10, (err, salt) => {
-                bcrypt.hash(user.email, salt, (err, hash) => {
-                    if (err) throw err;
-                    user.email = hash;
-                    user.save().then(user => res.json(user))
-                        .catch(err => console.log(err));
-                });
 
-            });
+    User.find({ $or: [{ email: req.body.email }, { username: req.body.username }, {password:req.body.password}] }).then(currentUser => {
+        if (currentUser.length != 0) {
+                    user.save().then(user => res.json(user))
+                        .catch(err => console.log(err))
+
         } else {
             res.json({ No: "Not a registered User" })
         }
     });
+    
 
 
 
