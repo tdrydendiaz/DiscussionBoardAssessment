@@ -9,7 +9,7 @@ module.exports = router;
 
 router.get("/all", (req, res) => {
     const errors = {};
-    User.find({}, '-password')
+    User.find({}, '-password -password2')
         .then(User => {
             if (!User) {
                 errors.noItems = "There are no items";
