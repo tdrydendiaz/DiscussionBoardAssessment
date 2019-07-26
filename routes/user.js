@@ -105,7 +105,7 @@ router.delete("/delete", (req, res) => {
 
 //{ $or: [{a: 1}, {b: 1}] }
 //if (input != 0)
-
+//USE THIS POST
 router.post("/hashcreate2", (req, res) => {
     const { errors, isValid } = validate(req.body);
     if (!isValid) {

@@ -3,6 +3,7 @@ const router = express.Router();
 const _ = require("lodash");
 const bcrypt = require("bcryptjs");
 const Item = require("../models/itemSchema")
+const User = require("./user.js")
 let myArray = [];
 const validateme = require("../validator/itemValidator.js")
 
@@ -20,9 +21,9 @@ router.get("/all", (req, res) => {
 });
 
 
-
-router.post("/create", (req, res) =>{
-    const {errors, isValid} = validateme(req.body);
+//original post
+router.post("/create", (req, res) => {
+    const { errors, isValid } = validateme(req.body);
     if (!isValid) {
         return res.status(400).json(errors);
     };
@@ -31,58 +32,83 @@ router.post("/create", (req, res) =>{
         context: req.body.context,
         email: req.body.email
     });
-    // user.save()
-    // .then(()=> {
-    //     res.json(user);
-    //      console.log('complete')
-    // })
-    // .catch(err => res.status(404).json({ noUsers: "User couldn't be added" }));
-  bcrypt.genSalt(10, (err, salt) => {
-    bcrypt.hash(user.email, salt, (err, hash) => {
-      if (err) throw err;
-      user.email = hash;
-      user.save().then(user => res.json(user))
-        .catch(err => console.log(err));
+
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(user.email, salt, (err, hash) => {
+            if (err) throw err;
+            user.email = hash;
+            user.save().then(user => res.json(user))
+                .catch(err => console.log(err));
+        });
+
+
+    });
+});
+
+//NEW POST
+router.post("/createItem", (req, res) => {
+    const { errors, isValid } = validateme(req.body);
+    if (!isValid) {
+        return res.status(400).json(errors);
+    };
+    const item = new Item({
+        name: req.body.username,
+        context: req.body.context,
+        email: req.body.email
+    });
+    User.find({ $or: [{ email: req.body.email }, { username: req.body.username }] }).then(currentUser => {
+        if (currentUser.length != 0) {
+            bcrypt.genSalt(10, (err, salt) => {
+                bcrypt.hash(user.email, salt, (err, hash) => {
+                    if (err) throw err;
+                    user.email = hash;
+                    user.save().then(user => res.json(user))
+                        .catch(err => console.log(err));
+                });
+
+            });
+        } else {
+            res.json({ No: "Not a registered User" })
+        }
     });
 
 
-});
-});
 
 
-router.put("/updatename", (req, res) => {
-    Item.replaceOne({ 'name': req.body.username },
-        { 'name': req.body.username, "context": req.body.context })
-        .then(({ ok, n }) => {
-            res.json(n)
+    router.put("/updatename", (req, res) => {
+        Item.replaceOne({ 'name': req.body.username },
+            { 'name': req.body.username, "context": req.body.context })
+            .then(({ ok, n }) => {
+                res.json(n)
+            })
+            .catch(err => res.status(404).json(err));
+    })
+
+
+
+    router.delete("/delete", (req, res) => {
+        errors = {};
+        const email = req.body.email;
+        const hashedValue = req.body.hashedValue;
+
+        //User.find() using _id
+        //get the email from the found user
+        // use this email as hashedvalue
+
+        bcrypt.compare(email, hashedValue).then(isMatch => {
+            if (isMatch) {
+                User.deleteOne({ 'name': req.body.username })
+                    .then(({ ok, n }) => {
+                        res.json(n)
+                    })
+                    .catch(err => res.status(404).json(err))
+            } else {
+                errors.value = "Incorrect";
+                return res.status(400).json(errors);
+            }
         })
-        .catch(err => res.status(404).json(err));
-})
-
-
-
-router.delete("/delete", (req, res) => {
- errors = {};
-  const email = req.body.email;
-  const hashedValue = req.body.hashedValue;
-
-  //User.find() using _id
-  //get the email from the found user
-// use this email as hashedvalue
-
-  bcrypt.compare(email, hashedValue).then(isMatch => {
-    if (isMatch) {
-    User.deleteOne({'name': req.body.username })
-        .then(({ ok, n }) => {
-            res.json(n)
-        })
-        .catch(err => res.status(404).json(err))
- } else {
-    errors.value = "Incorrect";
-    return res.status(400).json(errors);
-    }
-})
-.catch(err => res.status(404).json(err));
+            .catch(err => res.status(404).json(err));
+    })
 })
 
 
