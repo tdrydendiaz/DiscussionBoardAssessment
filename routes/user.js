@@ -103,6 +103,8 @@ router.delete("/delete", (req, res) => {
     })
 })
 
+//{ $or: [{a: 1}, {b: 1}] }
+//if (input != 0)
 
 router.post("/hashcreate2", (req, res) => {
     const { errors, isValid } = validate(req.body);
@@ -116,11 +118,9 @@ router.post("/hashcreate2", (req, res) => {
         password2: req.body.password2
     });
   
-User.findOne(email).then(user => {
-
-    bcrypt.compare(email, user.email).then(isMatch => {
-      if (isMatch) { errors.email = "Email Already in Use";
-        return res.status(400).json(errors);
+User.find({ $or: [{ email: req.body.email }, { username: req.body.username }] }).then(currentUser => {
+        if (currentUser.length != 0) {
+            res.json({ noAccount: "Email or Username unavailable" })
 
       } else {
          bcrypt.genSalt(10, (err, salt) => {
@@ -141,7 +141,4 @@ User.findOne(email).then(user => {
     });
       }
     });
-
-  }).catch(err => res.status(404).json({ noItem: "Account cannot be made" }));
-
-});
+})
