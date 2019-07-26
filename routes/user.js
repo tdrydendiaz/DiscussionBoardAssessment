@@ -9,7 +9,7 @@ module.exports = router;
 
 router.get("/all", (req, res) => {
     const errors = {};
-    User.find({}, '-email')
+    User.find({}, '-password')
         .then(User => {
             if (!User) {
                 errors.noItems = "There are no items";
@@ -19,7 +19,8 @@ router.get("/all", (req, res) => {
         })
         .catch(err => res.status(404).json({ noItems: "There are no items" }));
 });
-
+//', -email'
+//{}, '-email'
 router.post("/create", (req, res) =>{
     const user = new User({
         username: req.body.username,
@@ -33,3 +34,35 @@ router.post("/create", (req, res) =>{
     })
     .catch(err => res.status(404).json({ noUsers: "User couldn't be added" }));
 })
+
+router.put("/update", (req, res) => {
+    User.replaceOne({ 'username': req.body.username },
+        { 'username': req.body.username, "email": req.body.email })
+        .then(({ ok, n }) => {
+            res.json(n)
+        })
+        .catch(err => res.status(404).json(err));
+})
+
+// router.delete("/delete", (req, res) => {
+//  errors = {};
+//   const email = req.body.email;
+//   const hashedValue = req.body.hashedValue;
+
+//   //User.find() using _id
+//   //get the email from the found user
+// // use this email as hashedvalue
+
+//   bcrypt.compare(email, hashedValue).then(isMatch => {
+//     if (isMatch) {
+//     User.deleteOne({'username': req.body.username })
+//         .then(({ ok, n }) => {
+//             res.json(n)
+//         })
+//         .catch(err => res.status(404).json(err))
+//  } else {
+//     errors.value = "Incorrect";
+//     return res.status(400).json(errors);
+//     }
+// })
+// })
