@@ -78,6 +78,8 @@ router.put("/update", (req, res) => {
         .catch(err => res.status(404).json(err));
 })
 
+
+
 router.delete("/delete", (req, res) => {
     errors = {};
     const password = req.body.password;
@@ -99,4 +101,44 @@ router.delete("/delete", (req, res) => {
             return res.status(400).json(errors);
         }
     })
+})
+
+//{ $or: [{a: 1}, {b: 1}] }
+//if (input != 0)
+
+router.post("/hashcreate2", (req, res) => {
+    const { errors, isValid } = validate(req.body);
+    if (!isValid) {
+        return res.status(400).json(errors);
+    };
+    const user = new User({
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+        password2: req.body.password2
+    });
+  
+User.find({ $or: [{ email: req.body.email }, { username: req.body.username }] }).then(currentUser => {
+        if (currentUser.length != 0) {
+            res.json({ noAccount: "Email or Username unavailable" })
+
+      } else {
+         bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(user.password, salt, (err, hash) => {
+            if (err) throw err;
+            user.password = hash;
+            user.save().then(user => res.json(user))
+                .catch(err => console.log(err));
+        });
+    });
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(user.password2, salt, (err, hash) => {
+            if (err) throw err;
+            user.password2 = hash;
+            user.save().then(user => res.json(user))
+                .catch(err => console.log(err));
+        });
+    });
+      }
+    });
 })
