@@ -49,7 +49,7 @@ router.post("/hashcreate", (req, res) => {
         bcrypt.hash(user.password, salt, (err, hash) => {
             if (err) throw err;
             user.password = hash;
-            user.save().then(user => res.json(user))
+            user.save().then(user => res.json({ newUser: "Account Successfully Created :)" }))
                 .catch(err => console.log(err));
         });
     });
